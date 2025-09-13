@@ -2,11 +2,10 @@
 import telebot
 from pymongo import MongoClient
 import os
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # ---------------- CONFIG ----------------
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHANNEL_ID = os.getenv("CHANNEL_ID")   # example: -1001234567890
+CHANNEL_ID = os.getenv("CHANNEL_ID")
 MONGO_URI = os.getenv("MONGO_URI")
 
 # ----------------------------------------
@@ -19,10 +18,9 @@ movies = db["movies"]
 @bot.message_handler(content_types=['video'])
 def handle_video(message):
     try:
-        # Extract details
         file_id = message.video.file_id
         title_quality = message.caption or "Untitled Movie"
-        
+
         if "|" in title_quality:
             title, quality = [x.strip() for x in title_quality.split("|", 1)]
         else:
@@ -79,6 +77,7 @@ def search_movie(message):
         q = movie["quality"]
         grouped[q] = movie
 
+    from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
     markup = InlineKeyboardMarkup()
     for quality, movie in grouped.items():
         markup.add(InlineKeyboardButton(
@@ -111,6 +110,7 @@ def send_movie(call):
     bot.answer_callback_query(call.id, "🎥 Sending...")
 
 
-# ---------------- RUN ----------------
-print("🤖 Bot started with multi-quality support...")
-bot.infinity_polling()
+# -------- Run Bot Function --------
+def run_bot():
+    print("🤖 Bot started with multi-quality support...")
+    bot.infinity_polling()
